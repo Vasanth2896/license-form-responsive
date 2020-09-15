@@ -1,0 +1,31 @@
+Root.js
+ 
+R-> LTable /
+R-> FormIndex /layout
+   LForm(HOC)(Main V)
+        
+  
+LForm
+stpper logic
+3 forms data 
+R->Prd(S) /layout/prd:1
+R->Ad(S) /layout/ad 2
+R->Pd(S) /layout/pd 
+
+F-payscale
+ect...
+
+Save											prd=1
+/layout/prd/:id
+/layout/prd -> /layout/ad -> /layout/Pd
+a[name]											history.push(`layout/${a[RouteParamsName].currenRoute})
+// Stepper -> save
+const a={										stepperActivcation(){setStepActive(a[RouteParamsName].id)}
+[prd]:{id:1,nextRoute:"/ad"},
+[ad]:{id:2,currenRoute:"/ad",next
+[pd]:"list"
+}
+
+
+
+handleStepper(name){a[name].currentRoute}

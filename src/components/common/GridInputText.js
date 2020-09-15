@@ -7,12 +7,12 @@ const useStyles = makeStyles({
             display: "none"
         }
     }
-}); 
+});
 
 
 const GridInputText = (props) => {
 
-    const { gridSizeProps, label, fieldType } = props;
+    const { gridSizeProps, label, fieldType, handleChange, name, value, displayProperty} = props;
     const classes = useStyles();
 
     return (
@@ -21,13 +21,16 @@ const GridInputText = (props) => {
             lg={gridSizeProps.lg}
             md={gridSizeProps.md}
             sm={gridSizeProps.sm}
+            style={{ ...displayProperty }}
         >
             <TextField
                 className={classes.noSpinner}
                 fullWidth
                 variant='filled'
+                onChange={(event) => handleChange(name, event.target.value)}
                 label={label}
                 type={fieldType}
+                value={value}
             />
         </Grid>
     )

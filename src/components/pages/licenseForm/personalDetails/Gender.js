@@ -1,23 +1,25 @@
 import React from 'react';
-import { Box, FormLabel, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
+import { FormLabel, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
+import '../../../../styles/genderContainer.scss'
+
 
 const Gender = (props) => {
 
-    const { genderList } = props;
+    const { genderList, handleChange, name,value } = props;
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
+        <div className='genderContainer'>
             <FormLabel component="legend">Gender</FormLabel>
-            <RadioGroup aria-label="gender" row>
+            <RadioGroup aria-label="gender" value={value} row>
                 {
-                    genderList && genderList.map(gender => {
+                    genderList.map(gender => {
                         if (gender.id !== 3) {
                             return (
                                 <FormControlLabel
                                     key={gender.id}
                                     value={gender.id}
                                     control={<Radio color='primary' />}
-                                    // onChange={(e) => handleChange('genderId', gender.id)}
+                                    onChange={() => handleChange(name, gender.id)}
                                     label={gender.name} />
                             )
                         }

@@ -6,8 +6,17 @@ import { Grid } from '@material-ui/core';
 
 
 const GridDate = (props) => {
-    
-    const {label,gridSizeProps} = props;
+
+    const { label, gridSizeProps, name, value, handleChange } = props;
+
+    function convertToTimestamp(date) {
+        if (date !== null) {
+            let dateMomentObject = moment(value, "YYYY/MM/DD");
+            let dateObject = dateMomentObject.toDate();
+            return dateObject;
+        }
+        return null;
+    }
 
     return (
         <Grid
@@ -20,12 +29,11 @@ const GridDate = (props) => {
                 <KeyboardDatePicker
                     clearable
                     label={label}
-                    // value={personalDetails.dateOfBirth}
-                    // onChange={date => {
-                    //     personalDetails['dateOfBirth'] = date
-                    //     onChange('personalDetails', personalDetails);
-                    // }}
-                    // format="DD/MM/YYYY"
+                    value={convertToTimestamp(value)}
+                    onChange={date => {
+                        date ? handleChange(name, date) : handleChange(name, moment(date).format('YYYY/MM/DD'));
+                    }}
+                    format="YYYY/MM/DD"
                     inputVariant='filled'
                     fullWidth
                 />

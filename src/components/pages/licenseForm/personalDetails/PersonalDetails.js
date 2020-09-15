@@ -8,9 +8,11 @@ import * as apiAction from '../../../../apiConfig/apis';
 import Gender from './Gender';
 import ProductKnowledge from './ProductKnowledge';
 
-const PersonalDetails = () => {
+const PersonalDetails = (props) => {
 
-    const [personalDetailsSeed, setPersonalDetailSeed] = useState({});
+    const { personalDetails, updateState } = props;
+    let newPersonalDetails = { ...personalDetails };
+    const [personalDetailsSeed, setPersonalDetailsSeed] = useState({});
 
     useEffect(() => {
         const getPersonalDetailsSeed = async () => {
@@ -19,13 +21,18 @@ const PersonalDetails = () => {
             const knowledgeSeedData = await apiAction.getKnownViaProducts();
             const seedHolder = {
                 gender: genderData.data,
-                language: languagesData.data,
+                languages: languagesData.data,
                 knowledgeSeed: knowledgeSeedData.data,
             }
-            setPersonalDetailSeed({ ...seedHolder });
+            setPersonalDetailsSeed({ ...seedHolder });
         }
         getPersonalDetailsSeed();
     }, []);
+
+    const handleChange = (key, value) => {
+        newPersonalDetails[key] = value;
+        updateState('personalDetails', newPersonalDetails);
+    }
 
 
     return (
@@ -34,6 +41,9 @@ const PersonalDetails = () => {
                 <Grid container item lg={12} spacing={3}>
                     <GridInputText
                         label='User name'
+                        name='name'
+                        handleChange={handleChange}
+                        value={personalDetails.name || ''}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -42,74 +52,104 @@ const PersonalDetails = () => {
                     />
                     <Grid item lg={6} md={6} sm={6}>
                         <Gender
-                            genderList={personalDetailsSeed.gender}
+                            genderList={personalDetailsSeed.gender || []}
+                            handleChange={handleChange}
+                            name='genderId'
+                            value={personalDetails.genderId}
                         />
                     </Grid>
                     <GridDate
                         label='Date Of Birth'
+                        name='dateOfBirth'
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
                             sm: 6
                         }}
+                        value={personalDetails.dateOfBirth}
                     />
                     <GridInputText
                         label='Age'
+                        name='age'
                         fieldType='number'
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
                             sm: 6
                         }}
+                        value={personalDetails.age || ''}
                     />
                     <GridInputText
                         label='Mail id'
+                        name='mailId'
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
                             sm: 6
                         }}
+                        value={personalDetails.mailId || ''}
                     />
                     <GridInputText
                         label='Mobile Number'
+                        name='mobNo'
                         fieldType='number'
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
                             sm: 6
                         }}
+                        value={personalDetails.mobNo || ''}
                     />
                     <GridInputSelect
                         label='Mother Tongue'
+                        name='motherTongueId'
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
                             sm: 6
                         }}
+                        value={personalDetails.motherTongueId}
+                        menuOptions={personalDetailsSeed.language || []}
                     />
                     <GridAutoComplete
+                        name='preferredLanguageId'
+                        value={PersonalDetails.preferredLanguageId}
+                        languages={personalDetailsSeed.languages || []}
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 12,
                             md: 12,
                             sm: 12
                         }}
+
                     />
                     <Grid item lg={12} md={12} sm={12}>
                         <ProductKnowledge
                             formLabel='How you come to know about the product?'
                             knowledgeSeed={personalDetailsSeed.knowledgeSeed || []}
-                        // personalDetails={personalDetails}
-                        // onChange={onChange}
-                        // formGroupClassName={classes.feedbackCheckboxContainer}
+                            name='knownViaProducts'
+                            handleChange={handleChange}
+                            value={personalDetails.knownViaProducts}
+                            newPersonalDetails={newPersonalDetails}
+                            updateState={updateState}
                         />
                     </Grid>
                     <GridInputText
                         label='Other'
+                        name='others'
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 12,
                             md: 12,
                             sm: 12
                         }}
+                        value={personalDetails.others || ''}
+                        displayProperty={personalDetails.knownViaProducts.includes(6) ? { display: 'block' } : { display: 'none' }}
                     />
                 </Grid>
             </div>

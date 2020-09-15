@@ -1,13 +1,11 @@
 import React from 'react';
-import { Grid, Select, FormControl, InputLabel } from "@material-ui/core";
+import { Grid, Select, FormControl, InputLabel, MenuItem } from "@material-ui/core";
 
 const GridInputSelect = (props) => {
 
-    const { gridSizeProps, label } = props;
+    const { gridSizeProps, label, menuOptions,handleChange,name } = props;
 
-
-
-    return (
+return (
         <Grid
             item
             lg={gridSizeProps.lg}
@@ -18,7 +16,15 @@ const GridInputSelect = (props) => {
                 <InputLabel id={label}>{label}</InputLabel>
                 <Select
                     labelId={label}
+                    onChange={(event) => handleChange(name,event.target.value)}
                 >
+                    {menuOptions && menuOptions.map(options => {
+                        return (
+                            <MenuItem key={options.id} value={options.id}>{options.name}</MenuItem>
+                        )
+                    })
+
+                    }
 
                 </Select>
             </FormControl>

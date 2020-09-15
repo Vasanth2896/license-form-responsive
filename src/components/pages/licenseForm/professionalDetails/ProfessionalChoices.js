@@ -2,7 +2,7 @@ import React from 'react';
 import { RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
 
 const ProfessionalChoices = (props) => {
-    const { handleChange, classes, value, userRoles } = props;
+    const { handleChange, value, userRoles } = props;
 
     return (
         <div style={{ height: 100,background: '#8080801f',display: 'flex',alignItems: 'center',justifyContent: 'center'}}>
@@ -13,7 +13,7 @@ const ProfessionalChoices = (props) => {
                             <FormControlLabel
                                 key={role.id}
                                 value={role.id}
-                                // onChange={() => { handleChange('userRoleId', role.id) }}
+                                onChange={() => { handleChange('userRoleId', role.id) }}
                                 control={<Radio color='primary' />}
                                 label={role.name}
                             />

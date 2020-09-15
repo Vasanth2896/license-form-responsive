@@ -7,8 +7,19 @@ import _ from 'lodash';
 
 const ProductKnowledge = (props) => {
 
-    const { formLabel, knowledgeSeed, formGroupClassName } = props;
-    // const { knownViaProducts } = personalDetails;
+    const { formLabel, knowledgeSeed, formGroupClassName, newPersonalDetails, updateState } = props;
+    const { knownViaProducts } = newPersonalDetails;
+
+    const handleCheckChange = (id) => {
+        const handleProducts = !knownViaProducts.includes(id) ? [...knownViaProducts, id] : knownViaProducts.filter(check => check !== id)
+        newPersonalDetails['knownViaProducts'] = handleProducts;
+
+        if (!newPersonalDetails.knownViaProducts.includes(6)) {
+            newPersonalDetails['others'] = '';
+        }
+
+        updateState('personalDetails', newPersonalDetails);
+    }
 
     return (
         <Box>
@@ -19,10 +30,10 @@ const ProductKnowledge = (props) => {
                         return (
                             <FormControlLabel
                                 control={<Checkbox color='primary' />}
-                                // checked={knownViaProducts.includes(checkboxes.id)}
+                                checked={knownViaProducts.includes(checkboxes.id)}
                                 label={checkboxes.name}
                                 key={checkboxes.id}
-                            // onChange={() => handleCheckChange(checkboxes.id)}
+                                onChange={() => handleCheckChange(checkboxes.id)}
                             ></FormControlLabel>
                         )
                     })}

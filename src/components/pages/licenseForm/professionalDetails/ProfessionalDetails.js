@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, Grid, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
+import { Paper, Grid } from "@material-ui/core";
 import StudentForm from './StudentForm';
 import ProfessionalForm from './ProfessionalForm';
 import HousewivesForm from './HousewivesForm';
 import ProfessionalChoices from './ProfessionalChoices';
 import * as apiAction from '../../../../apiConfig/apis';
 
-const ProfessionalDetails = () => {
+const ProfessionalDetails = (props) => {
 
-    const [professionalDetailsSeed, setProfessionalDetailsSeed] = useState({});
+    const { qualificationDetails, updateState } = props;
+    let newQualificationDetails = { ...qualificationDetails }
+    const [qualificationDetailsSeed, setQualificationDetailsSeed] = useState({});
+
+    const handleChange = (key, value) => {
+        newQualificationDetails[key] = value;
+        updateState('qualificationDetails', newQualificationDetails);
+    }
 
     useEffect(() => {
-        const getProfessionalDetailsSeed = async () => {
+        const getQualificationDetailsSeed = async () => {
             const stateData = await apiAction.getStates();
             const qualificationDetailsData = await apiAction.getQualificationDetails();
             const professionalLevelData = await apiAction.getProfessionalLevel();
@@ -24,10 +31,46 @@ const ProfessionalDetails = () => {
                 salary: salaryPerAnnumData.data,
                 userRoles: userRolesData.data,
             }
-            setProfessionalDetailsSeed({ ...seedHolder });
+            setQualificationDetailsSeed({ ...seedHolder });
         }
-        getProfessionalDetailsSeed();
+        getQualificationDetailsSeed();
     }, [])
+
+    useEffect(() => {
+        if (qualificationDetails.stateId !== null) {
+            getDistrictData(qualificationDetails.stateId)
+        }
+    }, [qualificationDetails.stateId])
+
+    const getDistrictData = async (id) => {
+        const { data } = await apiAction.getDistricts(id);
+        setQualificationDetailsSeed({ ...qualificationDetailsSeed, districts: data });
+    }
+
+    const subComponentsCommonProps = {
+        newQualificationDetails: newQualificationDetails,
+        qualificationDetailsSeed: qualificationDetailsSeed,
+        ...props
+    };
+
+    const professionalDetailsSubComponents = [
+        {
+            id: 1,
+            subComponent: <StudentForm
+                {...subComponentsCommonProps}
+            />
+        },
+        {
+            id: 2,
+            subComponent: <ProfessionalForm
+                {...subComponentsCommonProps}
+            />
+        },
+        {
+            id: 3,
+            subComponent: <HousewivesForm />
+        }
+    ]
 
     return (
         <div>
@@ -37,29 +80,19 @@ const ProfessionalDetails = () => {
                     xs={12}
                 >
                     <Paper elevation={2} >
-                        <div style={{ background: '#8080801f' }}>
-                            <ProfessionalChoices
-                                // handleChange={handleRadioChange}
-                                // classes={classes}
-                                // value={professionalValue}
-                                userRoles={professionalDetailsSeed.userRoles || []}
-                            />
-                        </div>
+                        <ProfessionalChoices
+                            handleChange={handleChange}
+                            value={qualificationDetails.userRoleId}
+                            userRoles={qualificationDetailsSeed.userRoles || []}
+                        />
                     </Paper>
                 </Grid>
                 <Grid
                     item
                     xs={12}
                 >
-                    {/* <StudentForm /> */}
-                    <ProfessionalForm />
-                    {/* <HousewivesForm /> */}
-
-
-                    {/* {professionalValue === 'student' && <StudentForm {...props} />}
-                    {professionalValue === 'professional' && <ProfessionalForm  {...props} />}
-                    {professionalValue === 'housewives' && <HousewivesForm   {...props} />}
-                    <AlertBox open={open} handleClose={handleClose} handleClickOpen={handleClickOpen} handleOk={handleOk} professionalValue={professionalValue} /> */}
+                    {qualificationDetails.userRoleId ? professionalDetailsSubComponents[qualificationDetails.userRoleId - 1].subComponent : null}
+                    {/* <AlertBox open={open} handleClose={handleClose} handleClickOpen={handleClickOpen} handleOk={handleOk} professionalValue={professionalValue} />  */}
                 </Grid>
             </Grid>
         </div>

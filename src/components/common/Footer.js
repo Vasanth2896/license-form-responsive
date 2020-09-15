@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from "@material-ui/core";
+import '../../styles/footer.scss'
 
 
 const Footer = (props) => {
@@ -8,24 +9,8 @@ const Footer = (props) => {
 
 
     return (
-        <footer style={{
-            height: "80px",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row-reverse",
-            boxShadow: "0px -4px 5px -5px",
-            position: "sticky",
-            zIndex: "2",
-            bottom: "0px",
-            background: "white"
-        }}>
-            <div style={{
-                marginRight: "10em",
-                width: "13em",
-                display: "flex",
-                justifyContent: "space-evenly",
-                alignItems: "center"
-            }}>
+        <div className='footerContainer'>
+            <div className='footerButtonContainer'>
                 <Button
                     variant='contained'
                     onClick={handleBack}
@@ -36,7 +21,7 @@ const Footer = (props) => {
                     color='primary'
                 >next</Button>
             </div>
-        </footer >
+        </div >
     )
 }
 

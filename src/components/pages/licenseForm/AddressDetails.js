@@ -1,10 +1,45 @@
-import React from 'react';
-import { Paper, Grid, FormGroup, FormControlLabel } from "@material-ui/core";
+import React, { useEffect, useState } from 'react';
+import { Paper, Grid, FormGroup, FormControlLabel, Checkbox } from "@material-ui/core";
 import GridInputText from '../../common/GridInputText';
 import GridInputSelect from '../../common/GridInputSelect';
-import InputCheckbox from '../../common/InputCheckbox';
+import * as apiAction from '../../../apiConfig/apis';
 
-const AddressDetails = () => {
+const AddressDetails = (props) => {
+
+    const { addressDetails, updateState } = props;
+    let newAddressDetails = { ...addressDetails };
+    const [addressDetailsSeed, setAddressDetailsSeed] = useState({});
+
+    useEffect(() => {
+        if (addressDetails.stateId !== null) {
+            const getDistrictData = async () => {
+                const { data } = await apiAction.getDistricts(addressDetails.stateId);
+                setAddressDetailsSeed({ ...addressDetailsSeed, districts: data });
+            }
+            getDistrictData()
+        }
+    }, [addressDetails.stateId])
+
+
+    useEffect(() => {
+        const getAddressDetailsSeed = async () => {
+            const addressTypeData = await apiAction.getAddressType();
+            const stateData = await apiAction.getStates();
+            const seedHolder = {
+                addressType: addressTypeData.data,
+                states: stateData.data
+            }
+            console.log(seedHolder);
+            setAddressDetailsSeed({ ...seedHolder });
+        }
+        getAddressDetailsSeed();
+    }, [])
+
+    const handleChange = (key, value) => {
+        newAddressDetails[key] = value;
+        updateState('addressDetails', newAddressDetails);
+    }
+
 
     return (
         <Paper style={{ background: '#8080801f', height: '400px' }} elevation={2}>
@@ -12,6 +47,9 @@ const AddressDetails = () => {
                 <Grid container item lg={12} spacing={3}>
                     <GridInputText
                         label='Address'
+                        name='address'
+                        value={addressDetails.address || ''}
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 12,
                             md: 12,
@@ -20,6 +58,9 @@ const AddressDetails = () => {
                     />
                     <GridInputText
                         label='Country'
+                        name='country'
+                        value={addressDetails.country || ''}
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -28,6 +69,11 @@ const AddressDetails = () => {
                     />
                     <GridInputSelect
                         label='State'
+                        name='stateId'
+                        value={addressDetails.stateId}
+                        handleChange={handleChange}
+                        menuOptions={addressDetailsSeed.states || []}
+                        // menuOptions={[]}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -36,6 +82,10 @@ const AddressDetails = () => {
                     />
                     <GridInputSelect
                         label='District'
+                        name='districtId'
+                        value={addressDetails.districtId}
+                        handleChange={handleChange}
+                        menuOptions={addressDetailsSeed.districts || []}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -44,6 +94,9 @@ const AddressDetails = () => {
                     />
                     <GridInputText
                         label='Pincode'
+                        name='pincode'
+                        value={addressDetails.pincode || ''}
+                        handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -53,11 +106,16 @@ const AddressDetails = () => {
                     <Grid item lg={12} md={12} sm={12}>
                         <FormGroup row>
                             <FormControlLabel
-                                control={<InputCheckbox />}
+                                control={<Checkbox color='primary' />}
                                 label="Permanent Address is same as Communication Address"
+                                onChange={() => {
+                                    handleChange('type', addressDetailsSeed.addressType[(addressDetails.type + 2) % 2].id);
+                                }}
+                                checked={addressDetails.type === 2}
                             />
                         </FormGroup>
                     </Grid>
+                   
                 </Grid>
             </div>
         </Paper >
