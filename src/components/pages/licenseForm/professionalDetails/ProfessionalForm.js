@@ -1,17 +1,16 @@
 import React from 'react';
 import { Paper, Grid } from "@material-ui/core";
-import _ from 'lodash';
 import GridInputSelect from '../../../common/GridInputSelect';
 
 
 const ProfessionalForm = (props) => {
 
     const { qualificationDetails, updateState, qualificationDetailsSeed } = props;
-    let { newQualificationDetails } = props;
+
 
     const handleChange = (key, value) => {
-        newQualificationDetails[key] = value;
-        updateState('qualificationDetails', newQualificationDetails);
+        qualificationDetails[key] = value;
+        updateState('qualificationDetails', { ...qualificationDetails });
     }
 
     return (
@@ -21,7 +20,7 @@ const ProfessionalForm = (props) => {
                     <GridInputSelect
                         label='Level'
                         name='levelId'
-                        value={qualificationDetails.levelId}
+                        value={qualificationDetails.levelId || ''}
                         handleChange={handleChange}
                         menuOptions={qualificationDetailsSeed.professionalLevel}
                         gridSizeProps={{
@@ -33,7 +32,7 @@ const ProfessionalForm = (props) => {
                     <GridInputSelect
                         label='Salary per annum'
                         name='annumSal'
-                        value={qualificationDetails.annumSal}
+                        value={qualificationDetails.annumSal || ''}
                         handleChange={handleChange}
                         menuOptions={qualificationDetailsSeed.salary}
                         gridSizeProps={{

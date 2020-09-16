@@ -23,9 +23,8 @@ const CustomAutoComplete = withStyles({
 
 const GridAutoComplete = (props) => {
 
-    const { gridSizeProps, value, languages, handleChange } = props;
-    console.log(languages);
-
+    const { gridSizeProps, languages, handleChange, value } = props;
+    let valuesPresent = languages.filter(language => value.includes(language.id));
 
     return (
         <Grid
@@ -37,11 +36,11 @@ const GridAutoComplete = (props) => {
             <CustomAutoComplete
                 multiple
                 id="tags-standard"
-                value={value}
-                options={languages || []}
-                getOptionLabel={languages => languages.name}
-                onChange={(event, values) => {
-                    handleChange('preferredLanguageId', values.map(item => { return item.id }));
+                value={valuesPresent}
+                options={languages}
+                getOptionLabel={ languages => languages.name}
+                onChange={(event, languages) => {
+                    handleChange('preferredLanguageId', languages.map(language => { return language.id }));
                 }}
                 renderInput={params => (
                     <TextField

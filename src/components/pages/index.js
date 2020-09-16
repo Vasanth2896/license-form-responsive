@@ -3,8 +3,7 @@ import LicenseForm from './LicenseForm';
 
 const FormIndex = (props) => {
 
-  console.log(props);
-    
+  
     return (
         <div>
             <LicenseForm {...props}/>

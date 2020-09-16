@@ -1,10 +1,7 @@
 import React from "react";
 import Navbar from "./common/Navbar";
 import LicenseList from "./pages/licenseList/LicenseList";
-import PersonalDetails from "./pages/licenseForm/personalDetails/PersonalDetails";
-import AddressDetails from "./pages/licenseForm/AddressDetails";
-import ProfessionalDetails from './pages/licenseForm/professionalDetails/ProfessionalDetails';
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom';
+import { Route, Switch, BrowserRouter} from 'react-router-dom';
 import { routePath } from '../../src/routePath';
 import FormIndex from './pages/index'
 

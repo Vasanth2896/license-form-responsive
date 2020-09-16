@@ -7,11 +7,11 @@ import GridDate from '../../../common/GridDate';
 import * as apiAction from '../../../../apiConfig/apis';
 import Gender from './Gender';
 import ProductKnowledge from './ProductKnowledge';
+import _ from 'lodash';
 
 const PersonalDetails = (props) => {
 
-    const { personalDetails, updateState } = props;
-    let newPersonalDetails = { ...personalDetails };
+    const { personalDetailsError, personalDetails, updateState } = props;
     const [personalDetailsSeed, setPersonalDetailsSeed] = useState({});
 
     useEffect(() => {
@@ -30,8 +30,16 @@ const PersonalDetails = (props) => {
     }, []);
 
     const handleChange = (key, value) => {
-        newPersonalDetails[key] = value;
-        updateState('personalDetails', newPersonalDetails);
+        personalDetails[key] = value;
+        removeErrorMessage(key, value);
+        updateState('personalDetails', { ...personalDetails });
+    }
+
+    const removeErrorMessage = (key, value) => {
+        if ((key === 'name' || key === 'mailId') && !value.toString().replace(/\s/g, '').length <= 0) {
+            personalDetailsError[`${key}HelperText`] = '';
+            updateState('personalDetailsError', { ...personalDetailsError });
+        }
     }
 
 
@@ -44,6 +52,8 @@ const PersonalDetails = (props) => {
                         name='name'
                         handleChange={handleChange}
                         value={personalDetails.name || ''}
+                        helperText={personalDetailsError.nameHelperText}
+                        error={personalDetailsError.nameHelperText.length > 0}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -85,6 +95,8 @@ const PersonalDetails = (props) => {
                         label='Mail id'
                         name='mailId'
                         handleChange={handleChange}
+                        helperText={personalDetailsError.mailIdHelperText}
+                        error={personalDetailsError.mailIdHelperText.length > 0}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -113,12 +125,12 @@ const PersonalDetails = (props) => {
                             md: 6,
                             sm: 6
                         }}
-                        value={personalDetails.motherTongueId}
-                        menuOptions={personalDetailsSeed.language || []}
+                        value={personalDetails.motherTongueId || ''}
+                        menuOptions={personalDetailsSeed.languages || []}
                     />
                     <GridAutoComplete
                         name='preferredLanguageId'
-                        value={PersonalDetails.preferredLanguageId}
+                        value={personalDetails.preferredLanguageId || []}
                         languages={personalDetailsSeed.languages || []}
                         handleChange={handleChange}
                         gridSizeProps={{
@@ -126,19 +138,21 @@ const PersonalDetails = (props) => {
                             md: 12,
                             sm: 12
                         }}
-
                     />
-                    <Grid item lg={12} md={12} sm={12}>
-                        <ProductKnowledge
-                            formLabel='How you come to know about the product?'
-                            knowledgeSeed={personalDetailsSeed.knowledgeSeed || []}
-                            name='knownViaProducts'
-                            handleChange={handleChange}
-                            value={personalDetails.knownViaProducts}
-                            newPersonalDetails={newPersonalDetails}
-                            updateState={updateState}
-                        />
-                    </Grid>
+                    <ProductKnowledge
+                        formLabel='How you come to know about the product?'
+                        knowledgeSeed={personalDetailsSeed.knowledgeSeed || []}
+                        name='knownViaProducts'
+                        handleChange={handleChange}
+                        value={personalDetails.knownViaProducts}
+                        personalDetails={personalDetails}
+                        updateState={updateState}
+                        gridSizeProps={{
+                            lg: 12,
+                            md: 12,
+                            sm: 12
+                        }}
+                    />
                     <GridInputText
                         label='Other'
                         name='others'

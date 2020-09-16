@@ -1,10 +1,10 @@
 import React from 'react';
 import { Stepper, StepButton, Step, Paper } from "@material-ui/core";
+import '../../styles/navigationalStepper.scss'
 
 const NavigationalStepper = (props) => {
 
     const { steps, handleStep, activeStep } = props;
-
 
     return (
         <div>
@@ -13,7 +13,7 @@ const NavigationalStepper = (props) => {
                     nonLinear
                     orientation="vertical"
                     activeStep={activeStep}
-                    style={{ background: '#8080801f', height: 'auto' }}
+                    className='navigationStepperContainer'
                 >
                     {steps.map((step) => (
                         <Step key={step.id}>

@@ -3,9 +3,10 @@ import { Grid, Select, FormControl, InputLabel, MenuItem } from "@material-ui/co
 
 const GridInputSelect = (props) => {
 
-    const { gridSizeProps, label, menuOptions,handleChange,name } = props;
+    const { gridSizeProps, label, menuOptions, handleChange, name, value } = props;
+    
 
-return (
+    return (
         <Grid
             item
             lg={gridSizeProps.lg}
@@ -16,7 +17,8 @@ return (
                 <InputLabel id={label}>{label}</InputLabel>
                 <Select
                     labelId={label}
-                    onChange={(event) => handleChange(name,event.target.value)}
+                    onChange={(event) => handleChange(name, event.target.value)}
+                    value={value}
                 >
                     {menuOptions && menuOptions.map(options => {
                         return (

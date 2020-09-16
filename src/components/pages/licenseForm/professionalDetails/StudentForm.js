@@ -1,20 +1,15 @@
 import React from 'react';
 import { Paper, Grid, } from "@material-ui/core";
-import _ from 'lodash';
 import GridInputSelect from '../../../common/GridInputSelect';
 import GridInputText from '../../../common/GridInputText';
 
 
 const StudentForm = (props) => {
 
-    //TODO: have to handle the district here as well
-
-    const { qualificationDetails, updateState, qualificationDetailsSeed } = props;
-    let { newQualificationDetails } = props;
-
+    const { districts, qualificationDetails, updateState, qualificationDetailsSeed } = props;
     const handleChange = (key, value) => {
-        newQualificationDetails[key] = value;
-        updateState('qualificationDetails', newQualificationDetails);
+        qualificationDetails[key] = value;
+        updateState('qualificationDetails', {...qualificationDetails});
     }
 
     return (
@@ -24,7 +19,7 @@ const StudentForm = (props) => {
                     <GridInputSelect
                         label='Current Qualification'
                         name='userQualificationId'
-                        value={qualificationDetails.userQualificationId}
+                        value={qualificationDetails.userQualificationId || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 12,
@@ -36,7 +31,7 @@ const StudentForm = (props) => {
                     <GridInputText
                         label='Institution name'
                         name='institutionName'
-                        value={qualificationDetails.institutionName}
+                        value={qualificationDetails.institutionName || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
@@ -47,7 +42,7 @@ const StudentForm = (props) => {
                     <GridInputText
                         label='Studying at'
                         name='studyingAt'
-                        value={qualificationDetails.studyingAt}
+                        value={qualificationDetails.studyingAt || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
@@ -58,7 +53,7 @@ const StudentForm = (props) => {
                     <GridInputText
                         label='Institution Address'
                         name='institutionAddress'
-                        value={qualificationDetails.institutionAddress}
+                        value={qualificationDetails.institutionAddress || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 12,
@@ -69,7 +64,7 @@ const StudentForm = (props) => {
                     <GridInputText
                         label='Country'
                         name='country'
-                        value={qualificationDetails.country}
+                        value={qualificationDetails.country || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
@@ -80,7 +75,7 @@ const StudentForm = (props) => {
                     <GridInputSelect
                         label='State'
                         name='stateId'
-                        value={qualificationDetails.stateId}
+                        value={qualificationDetails.stateId || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
@@ -92,19 +87,19 @@ const StudentForm = (props) => {
                     <GridInputSelect
                         label='District'
                         name='districtId'
-                        value={qualificationDetails.districtId}
+                        value={qualificationDetails.districtId || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
                             sm: 6,
                         }}
-                        menuOptions={qualificationDetailsSeed.districts}
+                        menuOptions={districts || []}
                     />
                     <GridInputText
                         label='Pincode'
                         name='pincode'
-                        value={qualificationDetails.pincode}
+                        value={qualificationDetails.pincode || ''}
                         handleChange={handleChange}
                         gridSizeProps={{
                             lg: 6,

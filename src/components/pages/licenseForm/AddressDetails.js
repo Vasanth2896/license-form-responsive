@@ -7,18 +7,19 @@ import * as apiAction from '../../../apiConfig/apis';
 const AddressDetails = (props) => {
 
     const { addressDetails, updateState } = props;
-    let newAddressDetails = { ...addressDetails };
     const [addressDetailsSeed, setAddressDetailsSeed] = useState({});
+    const [districts, setDistricts] = useState([]);
 
     useEffect(() => {
         if (addressDetails.stateId !== null) {
-            const getDistrictData = async () => {
-                const { data } = await apiAction.getDistricts(addressDetails.stateId);
-                setAddressDetailsSeed({ ...addressDetailsSeed, districts: data });
-            }
-            getDistrictData()
+            getDistrictData();
         }
     }, [addressDetails.stateId])
+
+    const getDistrictData = async () => {
+        const { data } = await apiAction.getDistricts(addressDetails.stateId);
+        setDistricts([...data]);
+    }
 
 
     useEffect(() => {
@@ -29,15 +30,14 @@ const AddressDetails = (props) => {
                 addressType: addressTypeData.data,
                 states: stateData.data
             }
-            console.log(seedHolder);
             setAddressDetailsSeed({ ...seedHolder });
         }
         getAddressDetailsSeed();
     }, [])
 
     const handleChange = (key, value) => {
-        newAddressDetails[key] = value;
-        updateState('addressDetails', newAddressDetails);
+        addressDetails[key] = value;
+        updateState('addressDetails', { ...addressDetails });
     }
 
 
@@ -70,7 +70,7 @@ const AddressDetails = (props) => {
                     <GridInputSelect
                         label='State'
                         name='stateId'
-                        value={addressDetails.stateId}
+                        value={addressDetails.stateId || ''}
                         handleChange={handleChange}
                         menuOptions={addressDetailsSeed.states || []}
                         // menuOptions={[]}
@@ -83,9 +83,9 @@ const AddressDetails = (props) => {
                     <GridInputSelect
                         label='District'
                         name='districtId'
-                        value={addressDetails.districtId}
+                        value={addressDetails.districtId || ''}
                         handleChange={handleChange}
-                        menuOptions={addressDetailsSeed.districts || []}
+                        menuOptions={districts || []}
                         gridSizeProps={{
                             lg: 6,
                             md: 6,
@@ -115,7 +115,7 @@ const AddressDetails = (props) => {
                             />
                         </FormGroup>
                     </Grid>
-                   
+
                 </Grid>
             </div>
         </Paper >

@@ -8,6 +8,10 @@ import Footer from '../common/Footer';
 import PersonalDetails from './licenseForm/personalDetails/PersonalDetails';
 import AddressDetails from "./licenseForm/AddressDetails";
 import ProfessionalDetails from './licenseForm/professionalDetails/ProfessionalDetails';
+import "../../styles/licenseList.scss";
+import _ from "lodash";
+import { Redirect } from 'react-router-dom';
+
 
 const LicenseForm = (props) => {
 
@@ -36,17 +40,17 @@ const LicenseForm = (props) => {
         qualificationDetails: {
             userRoleId: 1,
             userQualificationId: null,
-            institutionName: "",
-            institutionAddress: "",
-            country: "",
-            studyingAt: "",
+            institutionName: null,
+            institutionAddress: null,
+            country: null,
+            studyingAt: null,
             stateId: null,
             districtId: null,
-            pincode: "",
+            pincode: null,
             levelId: null,
             annumSal: null
         },
-        personalDetailError: {
+        personalDetailsError: {
             nameHelperText: '',
             mailIdHelperText: '',
         },
@@ -71,11 +75,12 @@ const LicenseForm = (props) => {
     ];
 
     const updateState = (key, value) => {
-        setState({ ...state, [key]: value })
+        const newState = _.cloneDeep(state);
+        newState[key] = value;
+        setState(newState);
     }
 
     const handleNext = () => {
-
         if (activeStep !== 2) {
             setActiveStep(prevActiveStep => prevActiveStep + 1);
             history.push(steps[activeStep + 1].routePath);
@@ -120,6 +125,33 @@ const LicenseForm = (props) => {
 
     useEffect(handleBrowserButtons, [history, steps]);
 
+    const errorValidation = () => {
+        const { personalDetails } = state;
+        const { name, mailId } = personalDetails;
+        const mailIdRegex = /^([A-Z a-z][\w\d . _ -]+)@([\w\d _-]+).([a-z]{2,20})(\.[a-z]{2,10})$/;
+
+        if (!name || name === '' || name.toString().replace(/\s/g, '').length <= 0) {
+            state.personalDetailsError.nameHelperText = 'Please enter the name';
+        }
+
+        if (!mailId || mailId === '') {
+            state.personalDetailsError.mailIdHelperText = 'Please enter the mail id';
+        }
+
+        if (mailId && !mailIdRegex.test(mailId)) {
+            state.personalDetailsError.mailIdHelperText = 'invalid email ID';
+        }
+
+        updateState('personalDetailsError', { ...state.personalDetailsError });
+
+        if (state.personalDetailsError.nameHelperText || state.personalDetailsError.mailIdHelperText) {
+            return true
+        }
+        else {
+            return false;
+        }
+    }
+
     const formComponents = {
         personalDetails: {
             id: 1,
@@ -127,26 +159,60 @@ const LicenseForm = (props) => {
             // nextRoute: '/addressDetails',
             component: <PersonalDetails
                 personalDetails={state.personalDetails}
+                personalDetailsError={state.personalDetailsError}
                 updateState={updateState}
-            />
+            />,
+            footerProps: {
+                buttonText1: 'Cancel',
+                buttonText2: 'Next',
+                handleOnClick1: () => handleBack(),
+                handleOnClick2: () => {
+                    const isValid = errorValidation();
+                    if (!isValid) {
+                        handleNext();
+                    }
+                },
+            }
         },
         addressDetails: {
             id: 2,
-            // currentRoute: '/addressDetails', 
-            // nextRoute: '/professionalDetails', 
             component: <AddressDetails
-              addressDetails={state.addressDetails}
-              updateState={updateState}
-            />
+                addressDetails={state.addressDetails}
+                updateState={updateState}
+            />,
+            footerProps: {
+                buttonText1: 'back',
+                buttonText2: 'Next',
+                handleOnClick1: () => {
+                    handleBack();
+                },
+                handleOnClick2: () => {
+                    handleNext();
+                },
+            }
         },
         professionalDetails: {
             id: 3,
-            currentRoute: 'blah',
-            nextRoute: 'blah',
-            component: <ProfessionalDetails 
-            qualificationDetails={state.qualificationDetails}
-            updateState={updateState}
-        />
+            component: <ProfessionalDetails
+                qualificationDetails={state.qualificationDetails}
+                updateState={updateState}
+            />,
+            footerProps: {
+                buttonText1: 'Cancel',
+                buttonText2: 'save',
+                handleOnClick1: () => {
+                    handleBack();
+                },
+                handleOnClick2: () => {
+                    const isValid = errorValidation();
+                    if(!isValid){
+                    handleNext();
+                    }
+                    else{
+                      return  <Redirect from='/layout/:name' to={routePath.PERSONAL_DETAILS}/>
+                    }
+                },
+            }
         }
     }
 
@@ -178,8 +244,7 @@ const LicenseForm = (props) => {
                 </Grid>
             </Container>
             <Footer
-                handleNext={handleNext}
-                handleBack={handleBack}
+                {...formComponents[props.match.params.name].footerProps}
             />
         </div >
     )

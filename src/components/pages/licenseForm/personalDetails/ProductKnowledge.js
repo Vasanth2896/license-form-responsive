@@ -1,28 +1,33 @@
 import React from 'react';
 import {
-    Box, FormLabel, FormControlLabel, FormControl, FormGroup, Checkbox
+    Box, Grid, FormLabel, FormControlLabel, FormControl, FormGroup, Checkbox
 } from '@material-ui/core';
 import _ from 'lodash';
 
 
 const ProductKnowledge = (props) => {
 
-    const { formLabel, knowledgeSeed, formGroupClassName, newPersonalDetails, updateState } = props;
-    const { knownViaProducts } = newPersonalDetails;
+    const { formLabel, knowledgeSeed, formGroupClassName, personalDetails, updateState,gridSizeProps } = props;
+    const { knownViaProducts } = personalDetails;
 
     const handleCheckChange = (id) => {
         const handleProducts = !knownViaProducts.includes(id) ? [...knownViaProducts, id] : knownViaProducts.filter(check => check !== id)
-        newPersonalDetails['knownViaProducts'] = handleProducts;
+        personalDetails['knownViaProducts'] = handleProducts;
 
-        if (!newPersonalDetails.knownViaProducts.includes(6)) {
-            newPersonalDetails['others'] = '';
+        if (!personalDetails.knownViaProducts.includes(6)) {
+            personalDetails['others'] = '';
         }
 
-        updateState('personalDetails', newPersonalDetails);
+        updateState('personalDetails', { ...personalDetails });
     }
 
     return (
-        <Box>
+        <Grid
+        item 
+        lg={gridSizeProps.lg} 
+        md={gridSizeProps.md} 
+        sm={gridSizeProps.sm}
+        >
             <FormControl fullWidth>
                 <FormLabel component="legend">{formLabel}</FormLabel>
                 <FormGroup className={formGroupClassName} row>
@@ -39,7 +44,7 @@ const ProductKnowledge = (props) => {
                     })}
                 </FormGroup>
             </FormControl>
-        </Box>
+        </Grid>
     )
 
 }

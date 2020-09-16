@@ -5,21 +5,22 @@ import '../../styles/footer.scss'
 
 const Footer = (props) => {
 
-    const { handleNext, handleBack } = props;
-
-
     return (
         <div className='footerContainer'>
             <div className='footerButtonContainer'>
                 <Button
                     variant='contained'
-                    onClick={handleBack}
-                >cancel</Button>
+                    onClick={props.handleOnClick1}
+                >
+                    {props.buttonText1}
+                </Button>
                 <Button
                     variant='contained'
-                    onClick={handleNext}
+                    onClick={props.handleOnClick2}
                     color='primary'
-                >next</Button>
+                >
+                    {props.buttonText2}
+                </Button>
             </div>
         </div >
     )

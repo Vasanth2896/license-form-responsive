@@ -9,12 +9,30 @@ import * as apiAction from '../../../../apiConfig/apis';
 const ProfessionalDetails = (props) => {
 
     const { qualificationDetails, updateState } = props;
-    let newQualificationDetails = { ...qualificationDetails }
     const [qualificationDetailsSeed, setQualificationDetailsSeed] = useState({});
+    const [districts, setDistricts] = useState([]);
 
     const handleChange = (key, value) => {
-        newQualificationDetails[key] = value;
-        updateState('qualificationDetails', newQualificationDetails);
+        if (key === 'userRoleId') {
+            let initialQualificationDetails = {
+                userRoleId: value,
+                userQualificationId: null,
+                institutionName: null,
+                institutionAddress: null,
+                country: null,
+                studyingAt: null,
+                stateId: null,
+                districtId: null,
+                pincode: null,
+                levelId: null,
+                annumSal: null
+            }
+            updateState('qualificationDetails', initialQualificationDetails);
+        }
+        else {
+            qualificationDetails[key] = value;
+            updateState('qualificationDetails', { ...qualificationDetails });
+        }
     }
 
     useEffect(() => {
@@ -38,18 +56,18 @@ const ProfessionalDetails = (props) => {
 
     useEffect(() => {
         if (qualificationDetails.stateId !== null) {
-            getDistrictData(qualificationDetails.stateId)
+            getDistrictData(qualificationDetails.stateId);
         }
     }, [qualificationDetails.stateId])
 
     const getDistrictData = async (id) => {
         const { data } = await apiAction.getDistricts(id);
-        setQualificationDetailsSeed({ ...qualificationDetailsSeed, districts: data });
+        setDistricts([...data]);
     }
 
     const subComponentsCommonProps = {
-        newQualificationDetails: newQualificationDetails,
         qualificationDetailsSeed: qualificationDetailsSeed,
+        districts: districts,
         ...props
     };
 
