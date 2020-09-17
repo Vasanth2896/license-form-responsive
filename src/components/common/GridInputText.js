@@ -12,7 +12,18 @@ const useStyles = makeStyles({
 
 const GridInputText = (props) => {
 
-    const { gridSizeProps, label, fieldType, handleChange, name, value, displayProperty,helperText,error} = props;
+    const {
+        gridSizeProps,
+        label,
+        fieldType,
+        handleChange,
+        name,
+        value,
+        displayProperty,
+        helperText,
+        error,
+        disabled
+    } = props;
     const classes = useStyles();
 
     return (
@@ -33,6 +44,7 @@ const GridInputText = (props) => {
                 value={value}
                 helperText={helperText}
                 error={error}
+                disabled={disabled}
             />
         </Grid>
     )

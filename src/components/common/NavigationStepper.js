@@ -4,7 +4,7 @@ import '../../styles/navigationalStepper.scss'
 
 const NavigationalStepper = (props) => {
 
-    const { steps, handleStep, activeStep } = props;
+    const { steps, handleStep, activeStep, completed, disabled } = props;
 
     return (
         <div>
@@ -13,12 +13,15 @@ const NavigationalStepper = (props) => {
                     nonLinear
                     orientation="vertical"
                     activeStep={activeStep}
+                    completed={completed}
                     className='navigationStepperContainer'
                 >
                     {steps.map((step) => (
                         <Step key={step.id}>
                             <StepButton
                                 onClick={() => handleStep(step.id)}
+                                completed={completed[step.id]}
+                                disabled={disabled}
                             >
                                 {step.name}
                             </StepButton>

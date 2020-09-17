@@ -4,16 +4,70 @@ import StudentForm from './StudentForm';
 import ProfessionalForm from './ProfessionalForm';
 import HousewivesForm from './HousewivesForm';
 import ProfessionalChoices from './ProfessionalChoices';
+import AlertBox from './AlertBox';
 import * as apiAction from '../../../../apiConfig/apis';
+import { useSelector } from 'react-redux';
 
 const ProfessionalDetails = (props) => {
 
+    const editUserId = useSelector(state => state.appReducer.editId);
     const { qualificationDetails, updateState } = props;
     const [qualificationDetailsSeed, setQualificationDetailsSeed] = useState({});
     const [districts, setDistricts] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [editUserRoleId, setEditUserRoleId] = useState(null);
+
 
     const handleChange = (key, value) => {
         if (key === 'userRoleId') {
+            if (editUserId !== null) {
+                handleOpen();
+                setEditUserRoleId(value);
+            }
+            else {
+               clearQualificationDetails(value);
+            }
+        }
+        else {
+            qualificationDetails[key] = value;
+            updateState('qualificationDetails', { ...qualificationDetails });
+        }
+    }
+
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOk = () => {
+        clearQualificationDetails();
+        handleClose();
+    }
+
+    const clearQualificationDetails = (value) => {
+        if (editUserRoleId !== null) {
+            let editInitialQualificationDetails = {
+                userId: qualificationDetails.userId,
+                id: qualificationDetails.id,
+                userRoleId: editUserRoleId,
+                userQualificationId: null,
+                institutionName: null,
+                institutionAddress: null,
+                country: null,
+                studyingAt: null,
+                stateId: null,
+                districtId: null,
+                pincode: null,
+                levelId: null,
+                annumSal: null
+            };
+            setEditUserRoleId(null);
+            updateState('qualificationDetails', {...editInitialQualificationDetails});
+        }
+        else {
             let initialQualificationDetails = {
                 userRoleId: value,
                 userQualificationId: null,
@@ -27,11 +81,7 @@ const ProfessionalDetails = (props) => {
                 levelId: null,
                 annumSal: null
             }
-            updateState('qualificationDetails', initialQualificationDetails);
-        }
-        else {
-            qualificationDetails[key] = value;
-            updateState('qualificationDetails', { ...qualificationDetails });
+            updateState('qualificationDetails', {...initialQualificationDetails});
         }
     }
 
@@ -110,7 +160,11 @@ const ProfessionalDetails = (props) => {
                     xs={12}
                 >
                     {qualificationDetails.userRoleId ? professionalDetailsSubComponents[qualificationDetails.userRoleId - 1].subComponent : null}
-                    {/* <AlertBox open={open} handleClose={handleClose} handleClickOpen={handleClickOpen} handleOk={handleOk} professionalValue={professionalValue} />  */}
+                    <AlertBox
+                        open={open}
+                        handleClose={handleClose}
+                        handleOk={handleOk}
+                    />
                 </Grid>
             </Grid>
         </div>

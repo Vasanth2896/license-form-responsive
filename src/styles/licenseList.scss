@@ -1,1 +1,10 @@
 @import "~react_custom_table/src/styles/index.scss";
+
+.actionsContainer {
+  display: none;
+  cursor: pointer;
+}
+
+.ReactTable .rt-tbody .rt-tr-group:hover .actionsContainer {
+  display: inline-block;
+}

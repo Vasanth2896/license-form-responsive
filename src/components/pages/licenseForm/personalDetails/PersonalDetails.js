@@ -9,9 +9,11 @@ import Gender from './Gender';
 import ProductKnowledge from './ProductKnowledge';
 import _ from 'lodash';
 
+
 const PersonalDetails = (props) => {
 
-    const { personalDetailsError, personalDetails, updateState } = props;
+
+    const { personalDetailsError, personalDetails, updateState, editId } = props;
     const [personalDetailsSeed, setPersonalDetailsSeed] = useState({});
 
     useEffect(() => {
@@ -41,7 +43,6 @@ const PersonalDetails = (props) => {
             updateState('personalDetailsError', { ...personalDetailsError });
         }
     }
-
 
     return (
         <Paper style={{ background: '#8080801f', height: 'auto' }} elevation={2}>
@@ -103,6 +104,7 @@ const PersonalDetails = (props) => {
                             sm: 6
                         }}
                         value={personalDetails.mailId || ''}
+                        disabled={editId ? true : false}
                     />
                     <GridInputText
                         label='Mobile Number'

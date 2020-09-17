@@ -8,9 +8,10 @@ import Footer from '../common/Footer';
 import PersonalDetails from './licenseForm/personalDetails/PersonalDetails';
 import AddressDetails from "./licenseForm/AddressDetails";
 import ProfessionalDetails from './licenseForm/professionalDetails/ProfessionalDetails';
-import "../../styles/licenseList.scss";
+import "../../styles/licenseForm.scss";
 import _ from "lodash";
-import { Redirect } from 'react-router-dom';
+import { app_onChange, onSave, onCancel } from '../../store/appActions';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const LicenseForm = (props) => {
@@ -55,7 +56,30 @@ const LicenseForm = (props) => {
             mailIdHelperText: '',
         },
     });
+
+    const stepperState = state.personalDetailsError.nameHelperText || state.personalDetailsError.mailIdHelperText;
+    const dispatch = useDispatch();
+    const globalState = useSelector(state => state.appReducer);
+    const { user, editId } = globalState;
+
+    useEffect(() => {
+        if (editId) {
+            changeLocalStateOnEdit();
+        }
+    }, []);
+
+    const changeLocalStateOnEdit = () => {
+        setState({
+            ...user, personalDetailsError: {
+                nameHelperText: '',
+                mailIdHelperText: '',
+            },
+        })
+    }
+
     const [activeStep, setActiveStep] = useState(0);
+    const [completed, setCompleted] = useState({});
+    const newCompleted = { ...completed };
     const steps = [
         {
             id: 0,
@@ -101,7 +125,7 @@ const LicenseForm = (props) => {
     }
 
     const handleStep = (step) => {
-        history.push(steps[step].routePath, { steps: step });
+        history.push(steps[step].routePath);
         setActiveStep(step);
     };
 
@@ -123,6 +147,76 @@ const LicenseForm = (props) => {
         }
     }
 
+    const handleComplete = (completeflag, currentStep) => {
+        newCompleted[currentStep] = completeflag;
+        setCompleted({ ...newCompleted });
+    };
+
+    function handleBlankSpace(detail) {
+        if (detail) {
+            return !detail.toString().replace(/\s/g, '').length <= 0;
+        }
+    }
+
+    const personalDetailsStepperCheck = () => {
+        const { age, dateOfBirth, knownViaProducts, mailId, mobNo, motherTongueId, name, preferredLanguageId } = state.personalDetails;
+        const personalDetailTextField = { age, mailId, mobNo, name };
+        const personalDetailObjectFields = { dateOfBirth, motherTongueId };
+        const personalDetailsCollections = { knownViaProducts, preferredLanguageId };
+        const personalValidator = personalDetailsValidator(personalDetailTextField, personalDetailObjectFields, personalDetailsCollections);
+        handleComplete(personalValidator, 0);
+    }
+
+    const personalDetailsValidator = (textFields, objectFields, collectionFields) => {
+        const collectionValidation = Object.values(collectionFields).every(collection => collection.length);
+        const objectValidation = Object.values(objectFields).every(field => field !== null);
+        const textValidation = Object.values(textFields).every(detail => handleBlankSpace(detail));
+        const otherIsChecked = collectionValidation && objectValidation && textValidation && collectionFields.knownViaProducts.includes(6) && handleBlankSpace(state.personalDetails.others);
+        const otherIsNotChecked = collectionValidation && objectValidation && textValidation && !collectionFields.knownViaProducts.includes(6)
+
+        if (otherIsChecked || otherIsNotChecked) {
+            return true;
+        }
+
+        return false;
+    }
+
+    const addressDetailsStepperCheck = () => {
+        const { stateId, districtId, address, country, pincode } = state.addressDetails;
+        const addressDetailsIdFields = { stateId, districtId };
+        const addressDetailsTextField = { address, country, pincode };
+        const addressValidator = addressDetailsValidator(addressDetailsIdFields, addressDetailsTextField);
+        handleComplete(addressValidator, 1);
+    }
+
+    const addressDetailsValidator = (idFields, textFields) => {
+        const validation = Object.values(idFields).every(id => id !== null) && Object.values(textFields).every(detail => handleBlankSpace(detail));
+        return validation;
+    }
+
+    const qualificationDetailsStepperCheck = () => {
+        if (state.qualificationDetails.userRoleId === 3) {
+            handleComplete(true, 2);
+        }
+        else if (state.qualificationDetails.userRoleId === 2) {
+            const { levelId, annumSal } = state.qualificationDetails;
+            const professionalFormFields = { levelId, annumSal };
+            handleComplete(Object.values(professionalFormFields).every(field => field !== null), 2);
+        }
+        else if (state.qualificationDetails.userRoleId === 1) {
+            const { institutionName, institutionAddress, country,
+                studyingAt, pincode, userQualificationId, stateId, districtId } = state.qualificationDetails;
+            const studentFormTextFields = { institutionName, institutionAddress, country, studyingAt, pincode }
+            const studentFormIdFields = { userQualificationId, stateId, districtId }
+            const studentFormValidation = Object.values(studentFormTextFields).every(detail => handleBlankSpace(detail)) &&
+                Object.values(studentFormIdFields).every(id => id !== null);
+            handleComplete(studentFormValidation, 2)
+        }
+    }
+
+    useEffect(personalDetailsStepperCheck, [state.personalDetails]);
+    useEffect(addressDetailsStepperCheck, [state.addressDetails]);
+    useEffect(qualificationDetailsStepperCheck, [state.qualificationDetails]);
     useEffect(handleBrowserButtons, [history, steps]);
 
     const errorValidation = () => {
@@ -154,18 +248,20 @@ const LicenseForm = (props) => {
 
     const formComponents = {
         personalDetails: {
-            id: 1,
-            // currentRoute: '/personalDetails',
-            // nextRoute: '/addressDetails',
+            id: 0,
             component: <PersonalDetails
                 personalDetails={state.personalDetails}
                 personalDetailsError={state.personalDetailsError}
                 updateState={updateState}
+                editId={editId}
             />,
             footerProps: {
                 buttonText1: 'Cancel',
                 buttonText2: 'Next',
-                handleOnClick1: () => handleBack(),
+                handleOnClick1: () => {
+                    dispatch(onCancel());
+                    handleBack();
+                },
                 handleOnClick2: () => {
                     const isValid = errorValidation();
                     if (!isValid) {
@@ -175,7 +271,7 @@ const LicenseForm = (props) => {
             }
         },
         addressDetails: {
-            id: 2,
+            id: 1,
             component: <AddressDetails
                 addressDetails={state.addressDetails}
                 updateState={updateState}
@@ -192,24 +288,33 @@ const LicenseForm = (props) => {
             }
         },
         professionalDetails: {
-            id: 3,
+            id: 2,
             component: <ProfessionalDetails
                 qualificationDetails={state.qualificationDetails}
                 updateState={updateState}
             />,
             footerProps: {
                 buttonText1: 'Cancel',
-                buttonText2: 'save',
+                buttonText2: editId ? 'update' : 'save',
                 handleOnClick1: () => {
                     handleBack();
                 },
-                handleOnClick2: () => {
+                handleOnClick2: async () => {
                     const isValid = errorValidation();
-                    if(!isValid){
-                    handleNext();
+                    if (!isValid) {
+                        let user = {};
+                        Object.assign(user, {
+                            personalDetails: state.personalDetails,
+                            addressDetails: state.addressDetails,
+                            qualificationDetails: state.qualificationDetails
+                        })
+                        await dispatch(app_onChange('user', user));
+                        await dispatch(onSave());
+                        handleNext();
                     }
-                    else{
-                      return  <Redirect from='/layout/:name' to={routePath.PERSONAL_DETAILS}/>
+                    else {
+                        history.push(routePath.PERSONAL_DETAILS);
+                        setActiveStep(0);
                     }
                 },
             }
@@ -219,23 +324,19 @@ const LicenseForm = (props) => {
 
     return (
         <div>
-            <Container style={{ height: '100vh' }}>
-                <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-evenly",
-                    width: "13em",
-                    marginBottom: "20px"
-                }}>
+            <Container className='licenseFormContainer'>
+                <div className='backButtonContainer'>
                     <FontAwesomeIcon icon={faArrowLeft} onClick={() => backButtonNavigation(steps[activeStep])} style={{ cursor: 'pointer' }} />
                     <h3>Individual User</h3>
                 </div>
                 <Grid container spacing={7}>
-                    <Grid item lg={3} md={3} sm={3}>
+                    <Grid item lg={3} md={3} sm={3} style={{ cursor: stepperState ? 'not-allowed' : 'default' }}>
                         <NavigationalStepper
                             steps={steps}
                             handleStep={handleStep}
                             activeStep={activeStep}
+                            completed={completed}
+                            disabled={stepperState ? true : false}
                         />
                     </Grid>
                     <Grid item lg={9} md={9} sm={9}>
